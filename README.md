@@ -1,7 +1,4 @@
-=====================================
           EthCrawler (Ethereum Crawler)
-=====================================
-
 Overview:
 ---------
 EthCrawler is a Spring Boot application designed to interact with the Ethereum blockchain.
