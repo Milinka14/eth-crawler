@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethereum Crawler</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Axios CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- React and ReactDOM CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/react@18/umd/react.development.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@18/umd/react-dom.development.js"></script>
+    <!-- Babel CDN for JSX -->
+    <script src="https://cdn.jsdelivr.net/npm/@babel/standalone/babel.min.js"></script>
+    <style>
+        .nft-card {
+            transition: all 0.2s ease;
+        }
+        .nft-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .break-all {
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+<div id="root"></div>
+
+<script type="text/babel">
+    const { useState } = React;
+
+    // Format numbers without losing precision
+    const formatBalance = (value) => {
+        if (typeof value === 'string') {
+            return value;
+        } else if (typeof value === 'number' || value instanceof BigDecimal) {
+            return value.toString();
+        }
+        return '0';
+    };
+
+    // Main App Component
+    const App = () => {
+        const [transactions, setTransactions] = useState([]);
+        const [balance, setBalance] = useState(null);
+        const [error, setError] = useState('');
+        const [loading, setLoading] = useState(false);
+        const [filter, setFilter] = useState('all');
+
+        const clearResults = () => {
+            setTransactions([]);
+            setBalance(null);
+            setError('');
+            setFilter('all');
+        };
+
+        return (
+            <div className="max-w-7xl mx-auto p-4">
+                <h1 className="text-3xl font-bold text-center mb-6">Ethereum Crawler</h1>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <TransactionForm
+                        setTransactions={setTransactions}
+                        setError={setError}
+                        setLoading={setLoading}
+                        clearResults={clearResults}
+                    />
+                    <BalanceForm
+                        setBalance={setBalance}
+                        setError={setError}
+                        setLoading={setLoading}
+                        clearResults={clearResults}
+                    />
+                </div>
+                {error && (
+                    <div className="bg-red-100 text-red-700 p-4 rounded mb-6">
+                        {error}
+                    </div>
+                )}
+                {loading && (
+                    <div className="text-center text-gray-600">Loading...</div>
+                )}
+                {transactions.length > 0 && (
+                    <div className="flex justify-center space-x-4 mb-4 flex-wrap">
+                        <button
+                            className={`px-4 py-2 rounded ${filter === 'all' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                            onClick={() => setFilter('all')}
+                        >
+                            All
+                        </button>
+                        <button
+                            className={`px-4 py-2 rounded ${filter === 'eth' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                            onClick={() => setFilter('eth')}
+                        >
+                            ETH
+                        </button>
+                        <button
+                            className={`px-4 py-2 rounded ${filter === 'internal' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                            onClick={() => setFilter('internal')}
+                        >
+                            Internal
+                        </button>
+                        <button
+                            className={`px-4 py-2 rounded ${filter === 'tokens' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                            onClick={() => setFilter('tokens')}
+                        >
+                            Tokens
+                        </button>
+                        <button
+                            className={`px-4 py-2 rounded ${filter === 'nfts' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+                            onClick={() => setFilter('nfts')}
+                        >
+                            NFTs
+                        </button>
+                    </div>
+                )}
+                {transactions.length > 0 && (
+                    <TransactionTable transactions={transactions} filter={filter} />
+                )}
+                {balance && <BalanceDisplay balance={balance} />}
+            </div>
+        );
+    };
+
+    // Transaction Form Component (unchanged)
+    const TransactionForm = ({ setTransactions, setError, setLoading, clearResults }) => {
+        const [address, setAddress] = useState('');
+        const [startBlock, setStartBlock] = useState('');
+
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+            if (!address) {
+                setError('Please enter an Ethereum address.');
+                return;
+            }
+            setError('');
+            setLoading(true);
+            clearResults();
+            try {
+                const payload = { address, startBlock: startBlock ? Number(startBlock) : null };
+                console.log('Sending Transaction Payload:', payload);
+                const response = await axios.post(`${window.location.origin}/api/transactions`, payload);
+                console.log('Transaction Response:', response.data);
+                setTransactions(response.data);
+            } catch (err) {
+                setError('Failed to fetch transactions. Check the address or server status.');
+                console.error('Transaction Error:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        return (
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-4">Fetch Transactions</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label className="block text-gray-700">Address</label>
+                        <input
+                            type="text"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            className="w-full p-2 border rounded"
+                            placeholder="0x..."
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700">Start Block (Optional)</label>
+                        <input
+                            type="number"
+                            value={startBlock}
+                            onChange={(e) => setStartBlock(e.target.value)}
+                            className="w-full p-2 border rounded"
+                            placeholder="Enter start block"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                    >
+                        Fetch Transactions
+                    </button>
+                </form>
+            </div>
+        );
+    };
+
+    // Balance Form Component (unchanged)
+    const BalanceForm = ({ setBalance, setError, setLoading, clearResults }) => {
+        const [address, setAddress] = useState('');
+        const [date, setDate] = useState('');
+
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+            if (!address || !date) {
+                setError('Please enter an Ethereum address and date.');
+                return;
+            }
+            setError('');
+            setLoading(true);
+            clearResults();
+            try {
+                const payload = { address, date };
+                console.log('Sending Balance Payload:', payload);
+                const response = await axios.post(`${window.location.origin}/api/balance`, payload);
+                console.log('Balance Response:', response.data);
+                setBalance(response.data);
+            } catch (err) {
+                setError('Failed to fetch balance. Check inputs or server status.');
+                console.error('Balance Error:', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        return (
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-4">Fetch Balance</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-4">
+                        <label className="block text-gray-700">Address</label>
+                        <input
+                            type="text"
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            className="w-full p-2 border rounded"
+                            placeholder="0x..."
+                        />
+                    </div>
+                    <div className="mb-4">
+                        <label className="block text-gray-700">Date (YYYY-MM-DD)</label>
+                        <input
+                            type="date"
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                            className="w-full p-2 border rounded"
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+                    >
+                        Fetch Balance
+                    </button>
+                </form>
+            </div>
+        );
+    };
+
+    // Transaction Table Component (unchanged)
+    const TransactionTable = ({ transactions, filter }) => {
+        const filteredTransactions = transactions.filter(tx => {
+            if (filter === 'all') return true;
+            if (filter === 'eth') return tx.type === 'ETH';
+            if (filter === 'internal') return tx.type === 'ETH (internal)';
+            if (filter === 'tokens') return tx.type.startsWith('Token');
+            if (filter === 'nfts') return tx.type.startsWith('NFT');
+            return false;
+        });
+
+        return (
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-4">Transactions ({filteredTransactions.length})</h2>
+                <div className="overflow-x-auto">
+                    <table className="w-full text-left">
+                        <thead>
+                            <tr className="bg-gray-200">
+                                <th className="p-2 w-1/12">Type</th>
+                                <th className="p-2 w-2/12">From</th>
+                                <th className="p-2 w-2/12">To</th>
+                                <th className="p-2 w-2/12">Amount/Details</th>
+                                <th className="p-2 w-2/12">Gas Fee (ETH)</th>
+                                <th className="p-2 w-2/12">Timestamp</th>
+                                <th className="p-2 w-1/12">Block</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredTransactions.map((tx, index) => (
+                                <tr key={index} className="border-b hover:bg-gray-50">
+                                    <td className="p-2">
+                                        {tx.type.startsWith('NFT') ? (
+                                            <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">
+                                                NFT
+                                            </span>
+                                        ) : tx.type.startsWith('Token') ? (
+                                            <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                                                Token
+                                            </span>
+                                        ) : tx.type}
+                                    </td>
+                                    <td className="p-2 break-all">{tx.from}</td>
+                                    <td className="p-2 break-all">{tx.to}</td>
+                                    <td className="p-2 break-all">
+                                        {tx.type.startsWith('NFT') ? (
+                                            <div>
+                                                <p className="font-medium">{tx.tokenName || 'Unnamed NFT'}</p>
+                                                <p className="text-sm text-gray-600">ID: {tx.tokenId}</p>
+                                                <p className="text-xs text-gray-500 break-all">Contract: {tx.contractAddress}</p>
+                                            </div>
+                                        ) : (
+                                            formatBalance(tx.amount)
+                                        )}
+                                    </td>
+                                    <td className="p-2">
+                                        {tx.gasUsed && tx.gasPrice
+                                            ? formatBalance((Number(tx.gasUsed) * Number(tx.gasPrice)) / 1e18)
+                                            : 'N/A'}
+                                    </td>
+                                    <td className="p-2">{tx.timestamp}</td>
+                                    <td className="p-2">{tx.blockNumber}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        );
+    };
+
+    // Balance Display Component
+    const BalanceDisplay = ({ balance }) => {
+        return (
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h2 className="text-xl font-semibold mb-4">Balance</h2>
+
+                <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                    <h3 className="text-lg font-medium mb-2">ETH Balance</h3>
+                    <p className="text-2xl font-bold break-all">
+                        {balance && balance.eth ?
+                            formatBalance(balance.eth) + ' ETH' :
+                            '0 ETH'}
+                    </p>
+                </div>
+
+                <div className="mb-6 p-4 bg-green-50 rounded-lg">
+                    <h3 className="text-lg font-medium mb-2">Token Balances</h3>
+                    {balance && balance.tokens && Object.keys(balance.tokens).length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2">
+                            {Object.entries(balance.tokens).map(([symbol, amount], index) => (
+                                <div key={`token-${index}`} className="border p-3 rounded bg-white">
+                                    <p className="font-semibold">{symbol}</p>
+                                    <p className="text-gray-700 break-all">{formatBalance(amount)}</p>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-gray-500">No token balances found.</p>
+                    )}
+                </div>
+
+                <div className="p-4 bg-purple-50 rounded-lg">
+                    <h3 className="text-lg font-medium mb-2">NFT Collection</h3>
+                    {balance && balance.nfts && Object.keys(balance.nfts).length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                            {Object.entries(balance.nfts).map(([key, properties], index) => {
+                                const [name, tokenId] = properties;
+                                const contractAddress = key.replace(tokenId, '');
+                                const imageUrl = balance.nftImageUrls && balance.nftImageUrls[key];
+                                return (
+                                    <div key={`nft-${index}`} className="nft-card border p-4 rounded-lg bg-white">
+                                        <div className="h-40 rounded mb-2 overflow-hidden">
+                                            {imageUrl ? (
+                                                <img
+                                                    src={imageUrl}
+                                                    alt={name || `NFT ${tokenId}`}
+                                                    className="w-full h-full object-cover"
+                                                    onError={(e) => { e.target.src = 'https://via.placeholder.com/160x160?text=No+Image'; }}
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                                                    <span className="text-gray-500">No Image</span>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <p className="font-semibold truncate">{name || 'Unnamed NFT'}</p>
+                                        <p className="text-sm text-gray-600 break-all">ID: {tokenId}</p>
+                                        <p className="text-xs text-gray-500 truncate" title={contractAddress}>
+                                            Contract: {contractAddress.substring(0, 6)}...{contractAddress.substring(38)}
+                                        </p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <p className="text-gray-500">No NFTs found in this wallet.</p>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
+    // Render the App
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+</script>
+</body>
+</html>
