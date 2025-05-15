@@ -1,98 +1,90 @@
 EthCrawler: Ethereum Blockchain Crawler
 Overview
-EthCrawler is a Spring Boot application that interacts with the Ethereum blockchain to retrieve historical balances and transactions for a specified Ethereum address. It leverages the Etherscan and OpenSea APIs to fetch data and stores the results in a MySQL database. The application includes a lightweight React-based frontend for testing and is deployed in a Dockerized environment with two services:
+EthCrawler is a Spring Boot application that interacts with the Ethereum blockchain to retrieve historical balances and transaction data for a given Ethereum address. It integrates with Etherscan and OpenSea APIs and stores results in a MySQL database. The application includes a lightweight React-based frontend for testing and runs in a Dockerized environment with two services:
 
 app: Spring Boot backend
-db: MySQL database
-
+db: MySQL database with persistent storage
 
 Features
 
-Fetches transaction history and balances for Ethereum addresses
-Integrates with Etherscan and OpenSea APIs
-Stores data in a MySQL database with persistent storage
-Provides a simple React-based UI for testing
-Runs in a fully Dockerized environment for easy setup and deployment
-
+Retrieve transaction history and balances for Ethereum addresses
+Integrate with Etherscan and OpenSea APIs
+Store data in a MySQL database
+Provide a simple React UI for testing
+Deploy easily with Docker and Docker Compose
 
 Prerequisites
-To run EthCrawler, ensure you have the following installed:
+Before setting up EthCrawler, ensure you have:
 
-Docker: Docker and Docker Compose (e.g., Docker Desktop for Windows/Mac or Docker Engine for Linux)
-Java 21: Required to build the Spring Boot backend (handled within Docker)
+Docker: Docker and Docker Compose installed (e.g., Docker Desktop for Windows/Mac or Docker Engine for Linux)
+Java 21: Required for the Spring Boot backend (handled within Docker)
 Git: To clone the repository
-Internet Access: Needed to download Docker images and access external APIs
-
+Internet Access: For downloading Docker images and accessing APIs
 
 Setup Instructions
 1. Clone the Repository
-Clone the EthCrawler repository to your local machine and navigate to the project directory:
-git clone <repository-url>
-cd ethcrawler
-
+Clone the EthCrawler repository and navigate to the project directory:
+git clone <repository-url>cd ethcrawler
 Replace <repository-url> with the GitHub repository URL.
 2. Verify Key Files
 Ensure the following files are present in the project root:
 
 docker-compose.yml: Defines the app and db services
 Dockerfile: Builds the Spring Boot application
-pom.xml: Contains Maven dependencies for the backend
-src/main/resources/application.properties: Configuration for the Spring Boot app
-src/main/resources/static/index.html: React-based frontend for testing
+pom.xml: Specifies Maven dependencies
+src/main/resources/application.properties: Configures the Spring Boot app
+src/main/resources/static/index.html: Provides the React frontend
 
-3. Environment Variables
-The docker-compose.yml file includes the following default environment variables:
+3. Configure Environment Variables
+The docker-compose.yml file includes default environment variables:
 
 ETHERSCAN_API_KEY: IY6AIIRJPF7XX1B8NK9ZNS48JND3UUQF51
 OPENSEA_API_KEY: 279cf63c382a4c589a5b2e7101362f41
 MYSQL_ROOT_PASSWORD: 123
 
-Note: For simplicity, API keys are hardcoded in docker-compose.yml. To use your own API keys, update the docker-compose.yml file with your credentials.
-
+Note: API keys are hardcoded for simplicity. To use your own keys, update docker-compose.yml with your Etherscan and OpenSea API credentials.
 Running the Application
-1. Start the Containers
-From the project root, run the following command to build and start the services:
+1. Start the Services
+From the project root, build and start the Docker containers:
 docker-compose up --build
+This launches:
 
-This will start:
-
-app: Spring Boot backend running on port 8001
-db: MySQL database with a persistent volume
+app: Spring Boot backend on port 8001
+db: MySQL database with persistent storage
 
 2. Monitor Logs
-To verify that the services are running correctly, check the logs:
+Check the status of the services by viewing the logs:
 docker-compose logs -f
+Look for:
 
-Look for the following indicators:
-
-db-1: Logs containing "ready for connections"
-app-1: Logs containing "Started EthCrawlerApplication in X.XXX seconds"
+db-1: "ready for connections"
+app-1: "Started EthCrawlerApplication in X.XXX seconds"
 
 3. Access the Frontend
-Once the services are running, open a web browser and navigate to:
+Open a browser and navigate to:
 http://localhost:8001/
+Use the React UI to:
 
-Use the React-based UI to:
-
-Fetch transaction history for an Ethereum address
+Fetch Ethereum address transaction history
 Retrieve current and historical balances
 
-
 Stopping the Application
-To stop the running containers, press Ctrl+C in the terminal where docker-compose up is running, or execute:
+To stop the containers, press Ctrl+C in the terminal running docker-compose up, or run:
 docker-compose down
+This stops and removes the containers while preserving the MySQL database volume.
+Troubleshooting
 
-This will stop and remove the containers while preserving the MySQL database volume for persistence.
+API Issues: Verify your Etherscan and OpenSea API keys and check rate limits.
+Docker Issues: Ensure Docker is running and review logs for errors.
+Port Conflicts: Confirm port 8001 is free.
 
 Notes
 
-Ensure you have a stable internet connection to access the Etherscan and OpenSea APIs.
-If you encounter issues, check the Docker logs for error messages or consult the documentation for Etherscan/OpenSea API rate limits.
-For production use, consider securing API keys by using environment variable files or a secrets manager instead of hardcoding them.
-
+A stable internet connection is required for API access.
+For production, secure API keys using environment variable files or a secrets manager.
+The MySQL database uses a persistent volume to retain data between container restarts.
 
 Contributing
-Contributions are welcome! Please submit a pull request or open an issue on the GitHub repository for bugs, feature requests, or improvements.
-
+Contributions are welcome! Please submit pull requests or open issues on the GitHub repository for bugs, features, or improvements.
 License
 This project is licensed under the MIT License. See the LICENSE file for details.
