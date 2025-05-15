@@ -65,7 +65,7 @@ EthCrawler is a Spring Boot application that fetches Ethereum blockchain data, i
    - `app`: Spring Boot backend on port **8001**
    - `db`: MySQL database with persistent storage
 
-   > **Note**: The MySQL containter starts first but the app container may fail to start automatically after `docker-compose up --build`. If so, manually start the app container service in Docker Desktop..
+   > **Note**: The MySQL containter starts first but the app container may fail to start automatically after `docker-compose up --build`. If so, manually start the app container in Docker Desktop..
 
 2. **Check Logs** (Optional)
 
