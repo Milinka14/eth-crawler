@@ -17,7 +17,6 @@ EthCrawler is a Spring Boot application that fetches Ethereum blockchain data, i
 ## Prerequisites
 
 - **Docker** and **Docker Compose** (Docker Desktop for Windows/Mac or Docker Engine for Linux)
-- **Java 21** (handled in Docker)
 - **Git** for cloning the repository
 - **Internet access** for APIs and Docker images
 
@@ -88,18 +87,6 @@ EthCrawler is a Spring Boot application that fetches Ethereum blockchain data, i
 
 ---
 
-## Stopping the App
-
-Stop the containers:
-
-```bash
-docker-compose down
-```
-
-This preserves the MySQL database volume.
-
----
-
 ## Troubleshooting
 
 - **API Issues**: Check Etherscan/OpenSea API keys and rate limits.
@@ -115,13 +102,3 @@ This preserves the MySQL database volume.
 - MySQL data persists between container restarts.
 
 ---
-
-## Contributing
-
-Submit pull requests or open issues on GitHub for bugs, features, or improvements.
-
----
-
-## License
-
-MIT License. See the `LICENSE` file for details.
