@@ -1,6 +1,6 @@
 # EthCrawler
 
-EthCrawler is a Spring Boot application that fetches Ethereum blockchain data, including transaction history and balances, using Etherscan and OpenSea APIs. It stores data in a MySQL database and includes a React frontend for testing. The app runs in a Dockerized environment for easy deployment.
+EthCrawler is a Spring Boot application that fetches Ethereum blockchain data, including transaction history and balances, using Etherscan and OpenSea APIs. It stores data in a MySQL database for optimization and includes a React frontend for testing. The app runs in a Dockerized environment for easy deployment.
 
 ---
 
