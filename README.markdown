@@ -102,13 +102,3 @@ EthCrawler is a Spring Boot application that fetches Ethereum blockchain data, i
 - MySQL data persists between container restarts.
 
 ---
-
-## Contributing
-
-Submit pull requests or open issues on GitHub for bugs, features, or improvements.
-
----
-
-## License
-
-MIT License. See the `LICENSE` file for details.
