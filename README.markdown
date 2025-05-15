@@ -67,7 +67,7 @@ EthCrawler is a Spring Boot application that fetches Ethereum blockchain data, i
 
    > **Note**: If the app doesn’t start automatically after `docker-compose up --build`, manually start the app service in Docker Desktop.
 
-2. **Check Logs**(Optional)
+2. **Check Logs** (Optional)
 
    ```bash
    docker-compose logs -f
