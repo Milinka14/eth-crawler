@@ -28,7 +28,7 @@ EthCrawler is a Spring Boot application that fetches Ethereum blockchain data, i
 
    ```bash
    git clone https://github.com/Milinka14/eth-crawler.git
-   cd ethcrawler
+   cd eth-crawler
    ```
    
 2. **Verify Files**
