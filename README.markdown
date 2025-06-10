@@ -44,8 +44,8 @@ EthCrawler is a Spring Boot application that fetches Ethereum blockchain data, i
 
    The `docker-compose.yml` includes:
    ```yaml
-   ETHERSCAN_API_KEY: IY6AIIRJPF7XX1B8NK9ZNS48JND3UUQF51
-   OPENSEA_API_KEY: 279cf63c382a4c589a5b2e7101362f41
+   ETHERSCAN_API_KEY: x
+   OPENSEA_API_KEY: x
    MYSQL_ROOT_PASSWORD: 123
    ```
 
